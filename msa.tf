@@ -27,6 +27,16 @@ provider "ibm" {
 #########################################################
 # Define the variables
 #########################################################
+variable bxapikey {
+  description = "Your Bluemix API Key."
+}
+variable slusername {
+  description = "Your Softlayer username."
+}
+variable slapikey {
+  description = "Your Softlayer API Key."
+}
+
 variable "datacenter" {
   description = "Softlayer datacenter where infrastructure resources will be deployed"
   default = "ams01"
