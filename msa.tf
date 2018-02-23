@@ -129,7 +129,7 @@ resource "ibm_compute_vm_instance" "softlayer_virtual_guest" {
   provisioner "remote-exec" {
   inline = [
   #	"mkdir \tmp; cd \tmp",
-    "curl -k \"https://s3.eu-gb.objectstorage.softlayer.net/bigfixbbucket/VirtualBox-5.2.6-120293-Win.exe\" -H \"Authorization: Bearer ${var.cos_token}\"  --output bigfix.tgz",
+    "curl -k \"https://s3.eu-gb.objectstorage.softlayer.net/bigfixbbucket/BigFix_Pltfrm_Install_V95_Lnx_DB2.tgz\" -H \"Authorization: Bearer ${var.cos_token}\"  --output bigfix.tgz",
   ]
   }
 
