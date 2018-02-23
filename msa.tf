@@ -104,6 +104,7 @@ resource "ibm_compute_vm_instance" "softlayer_virtual_guest" {
   dedicated_acct_host_only = false
   local_disk               = false
   ssh_key_ids              = ["${ibm_compute_ssh_key.cam_public_key.id}", "${ibm_compute_ssh_key.temp_public_key.id}"]
+  user_metadata            = "${file("test.txt")}"
 
   # Specify the ssh connection
   connection {
@@ -128,14 +129,14 @@ resource "ibm_compute_vm_instance" "softlayer_virtual_guest" {
   provisioner "remote-exec" {
   inline = [
   #	"mkdir \tmp; cd \tmp",
-    "curl -k \"https://s3.eu-gb.objectstorage.softlayer.net/bigfixbbucket/VirtualBox-5.2.6-120293-Win.exe\" -H \"Authorization: Bearer ${var.cos_token}\"  >>test.exe",
+    "curl -k \"https://s3.eu-gb.objectstorage.softlayer.net/bigfixbbucket/VirtualBox-5.2.6-120293-Win.exe\" -H \"Authorization: Bearer ${var.cos_token}\"  --output bigfix.tgz",
   ]
   }
 
   # Execute the script remotely
   # provisioner "remote-exec" {
   # inline = [
-  #   "cd /tmp; tar -xvf  bigfix.tar.gz; chmod +x /tmp/installation.sh; sudo bash /tmp/installation.sh –f bigfixresponsefile –opt   BES_GATHER_INTERVAL=$(var.bigfix_var1) –opt BES_CERT_FILE=$(var.bigfix_var2)",
+  #   "tar -xvf  bigfix.tgz; chmod +x ./installation.sh; sudo bash /tmp/installation.sh –f bigfixresponsefile –opt   BES_GATHER_INTERVAL=$(var.bigfix_var1) –opt BES_CERT_FILE=$(var.bigfix_var2)",
   # ]
   # }
 
