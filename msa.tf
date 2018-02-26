@@ -137,7 +137,7 @@ resource "ibm_compute_vm_instance" "softlayer_virtual_guest" {
   inline = [
 #    "cd /tmp; tar -xvf  bigfix.tar.gz; chmod +x /tmp/installation.sh; sudo bash /tmp/installation.sh –f bigfixresponsefile –opt   BES_GATHER_INTERVAL=$(var.bigfix_var1) –opt BES_CERT_FILE=$(var.bigfix_var2)",
 #     "tar -xvf  bigfix.tar.gz; chmod +x /tmp/installation.sh; sudo bash /tmp/installation.sh –f bigfixresponsefile",
-      "tar -xvf  bigfix95.tgz; chmod +x /tmp/installation.sh",
+      "tar -xvf  bigfix95.tgz",
   ]
   }
 
