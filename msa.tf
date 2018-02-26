@@ -29,12 +29,15 @@ provider "ibm" {
 #########################################################
 variable bxapikey {
   description = "Your Bluemix API Key."
+  default = "t3MKI4knQ1hdiUiI0PJR-pdO3ZnmEeYBgqZIXwODVFay"
 }
 variable slusername {
   description = "Your Softlayer username."
+  default = "IBM1571427"
 }
 variable slapikey {
   description = "Your Softlayer API Key."
+  default = "0e73dfc9772125b6e8189e50f151a37a37ae06e32ea5c459cec14bc1a211335c"
 }
 
 variable "datacenter" {
@@ -49,6 +52,7 @@ variable "hostname" {
 
 variable "public_ssh_key" {
   description = "Public SSH key used to connect to the virtual guest"
+  default = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC7P8Yw0vVZpUwD94mLbAhgjhGRTwwgBW1wLILfik8BiaL7psThwnelR9YcPO2FOs+u2x6SzLKe2VWVrhU/ZREmX9t5qgtB0xHP2n4gqGbDv7PU7vILSYxzQdmlHmrF0YfTTHOq0/IlogDcoAFN4jysZs26DwcCrzDcifcvjkGs29vZZcpkJBZeRzufqP4+MiP0u7BckXGL3dbyRyoaWEy2hgk+n9cqDoE57WMKUkA357q945N6/HFeLvd6J2YQzI+64riBIg3I03xTbFZJ/T0VXNCk530CBalW453hP9sXdtBktuu1MHawtmt8VldqMVSp7ZXsz25KNjgZtAfC7oUV"
 }
 
 variable "cos_token" {
