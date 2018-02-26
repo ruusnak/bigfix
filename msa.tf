@@ -128,17 +128,18 @@ resource "ibm_compute_vm_instance" "softlayer_virtual_guest" {
   # Execute the script remotely - ACCESS COS using curl
   provisioner "remote-exec" {
   inline = [
-  #	"mkdir \tmp; cd \tmp",
-    "curl -k \"https://s3.eu-gb.objectstorage.softlayer.net/bigfixbbucket/BigFix_Pltfrm_Install_V95_Lnx_DB2.tgz\" -H \"Authorization: Bearer ${var.cos_token}\"  --output bigfix.tgz",
+    "curl -k \"https://s3.eu-gb.objectstorage.softlayer.net/bigfixbbucket/BigFix_Pltfrm_Install_V95_Lnx_DB2.tgz?AWSAccessKeyId=06690a231ffd44ab980fed5be88e86eb&Expires=1529632988&Signature=hHzg%2FtZzauXOX2LZZCQVWAZ4VnM%3D\" --output bigfix95.tgz",
   ]
   }
 
   # Execute the script remotely
-  # provisioner "remote-exec" {
-  # inline = [
-  #   "tar -xvf  bigfix.tgz; chmod +x ./installation.sh; sudo bash /tmp/installation.sh –f bigfixresponsefile –opt   BES_GATHER_INTERVAL=$(var.bigfix_var1) –opt BES_CERT_FILE=$(var.bigfix_var2)",
-  # ]
-  # }
+  provisioner "remote-exec" {
+  inline = [
+#    "cd /tmp; tar -xvf  bigfix.tar.gz; chmod +x /tmp/installation.sh; sudo bash /tmp/installation.sh –f bigfixresponsefile –opt   BES_GATHER_INTERVAL=$(var.bigfix_var1) –opt BES_CERT_FILE=$(var.bigfix_var2)",
+#     "tar -xvf  bigfix.tar.gz; chmod +x /tmp/installation.sh; sudo bash /tmp/installation.sh –f bigfixresponsefile",
+      "tar -xvf  bigfix.tar.gz; chmod +x /tmp/installation.sh",
+  ]
+  }
 
 }
 
