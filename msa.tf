@@ -29,15 +29,15 @@ provider "ibm" {
 #########################################################
 variable bxapikey {
   description = "Your Bluemix API Key."
-  default = "t3MKI4knQ1hdiUiI0PJR-pdO3ZnmEeYBgqZIXwODVFay"
+  default = "key1"
 }
 variable slusername {
   description = "Your Softlayer username."
-  default = "IBM1571427"
+  default = "000000"
 }
 variable slapikey {
   description = "Your Softlayer API Key."
-  default = "0e73dfc9772125b6e8189e50f151a37a37ae06e32ea5c459cec14bc1a211335c"
+  default = "key2"
 }
 
 variable "datacenter" {
