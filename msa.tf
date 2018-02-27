@@ -29,15 +29,15 @@ provider "ibm" {
 #########################################################
 variable bxapikey {
   description = "Your Bluemix API Key."
-  default = "key1"
+  default = "bmxapikey"
 }
 variable slusername {
   description = "Your Softlayer username."
-  default = "000000"
+  default = "slusername"
 }
 variable slapikey {
   description = "Your Softlayer API Key."
-  default = "key2"
+  default = "slapikey"
 }
 
 variable "datacenter" {
@@ -57,7 +57,12 @@ variable "public_ssh_key" {
 
 variable "cos_token" {
   description = "IAM Token to access COS"
-  default = "eyJraWQiOiIyMDE3MTAzMC0wMDowMDowMCIsImFsZyI6IlJTMjU2In0.eyJpYW1faWQiOiJJQk1pZC0xMjAwMDBFN0tTIiwiaWQiOiJJQk1pZC0xMjAwMDBFN0tTIiwicmVhbG1pZCI6IklCTWlkIiwiaWRlbnRpZmllciI6IjEyMDAwMEU3S1MiLCJnaXZlbl9uYW1lIjoiSk9VS08iLCJmYW1pbHlfbmFtZSI6IlJVVVNLQU5FTiIsIm5hbWUiOiJKT1VLTyBSVVVTS0FORU4iLCJlbWFpbCI6ImpvdWtvLnJ1dXNrYW5lbkBmaS5pYm0uY29tIiwic3ViIjoiam91a28ucnV1c2thbmVuQGZpLmlibS5jb20iLCJhY2NvdW50Ijp7ImJzcyI6ImY2NjVhNjkyNTdhOWZiZThiOGJmMGY3N2JjMjU4YTU3IiwiaW1zIjoiMTU3MTQyNyJ9LCJpYXQiOjE1MTkzNzA0NjgsImV4cCI6MTUxOTM3NDA2OCwiaXNzIjoiaHR0cHM6Ly9pYW0uYmx1ZW1peC5uZXQvaWRlbnRpdHkiLCJncmFudF90eXBlIjoicGFzc3dvcmQiLCJzY29wZSI6Im9wZW5pZCIsImNsaWVudF9pZCI6ImJ4In0.ACLiyBm8pAyRgSYEjsBPSPxZGzIWYE_wKzDo4WuGOOiIUyd7EMkkSkZhIQgQ-8mJc7X3f3bpdASBkKj-KWVvVLXrXUX_QlU3YCF5G69lSckIrw9wSE6vyoALA6V8WoHimn4Bg8vVGGZXRdDGg6_A8rxDbXcrH1FUB74iVTsVYNkt1CetLZgMmDE8oUC14dWDU_GoNeS9GfS-LqVw4bMTA_Mr5_zB2BMj3TBjF7CSlKQQ8KXffe4RStvsaDjz8MStOz27nRMW88PAMLh7G_nLdLnmuQk9mCBwFnGrprZdKwXG3USGZpGeGwc_5zY7f9nA-cZqKZu3E_XWd0r2DUngOQ"
+  default = "empty"
+}
+
+variable "db2pw" {
+  description = "DB2_ADMIN_PWD"
+  default     = "SalainenW0rd!"
 }
 
 variable "bigfix_var1" {
@@ -66,7 +71,7 @@ variable "bigfix_var1" {
 }
 
 variable "bigfix_var2" {
-  description = "Variable 1 for BigFix installation"
+  description = "Variable 2 for BigFix installation"
   default     = "value2"
 }
 
@@ -96,15 +101,15 @@ resource "ibm_compute_ssh_key" "temp_public_key" {
 ##############################################################
 resource "ibm_compute_vm_instance" "softlayer_virtual_guest" {
   hostname                 = "${var.hostname}"
-  os_reference_code        = "CENTOS_7_64"
-  domain                   = "cam.ibm.com"
+  os_reference_code        = "REDHAT_7_64"
+  domain                   = "bigfix95.com"
   datacenter               = "${var.datacenter}"
   network_speed            = 10
   hourly_billing           = true
   private_network_only     = false
-  cores                    = 1
-  memory                   = 1024
-  disks                    = [25]
+  cores                    = 2
+  memory                   = 16384
+  disks                    = [100]
   dedicated_acct_host_only = false
   local_disk               = false
   ssh_key_ids              = ["${ibm_compute_ssh_key.cam_public_key.id}", "${ibm_compute_ssh_key.temp_public_key.id}"]
@@ -129,27 +134,65 @@ resource "ibm_compute_vm_instance" "softlayer_virtual_guest" {
   # destination = "/tmp/bigfixresponsefile"
   # }
 
-  # Execute the script remotely - ACCESS COS using curl
+  # Execute curl to ACCESS COS ... download BigFix binary package
   provisioner "remote-exec" {
   inline = [
     "curl -k \"https://s3.eu-gb.objectstorage.softlayer.net/bigfixbbucket/BigFix_Pltfrm_Install_V95_Lnx_DB2.tgz?AWSAccessKeyId=06690a231ffd44ab980fed5be88e86eb&Expires=1529632988&Signature=hHzg%2FtZzauXOX2LZZCQVWAZ4VnM%3D\" --output bigfix95.tgz",
   ]
   }
 
-  # Execute the script remotely
+  # Generate bigfix installation responsefile on the fly
+    provisioner "file" {
+    content = <<EOF
+##BIGFIX GENERATED RESPONSE FILE
+LA_ACCEPT="true"
+IS_EVALUATION="true"
+CREDENTIAL_USER_FIRSTNAME="John"
+CREDENTIAL_USER_LASTNAME="Smith"
+CREDENTIAL_EMAIL="john.smith@mydomain.com"
+CREDENTIAL_ORG="IBM US"
+SRV_DNS_NAME="DNSHOST.mydomain.com"
+BES_SERVER_PORT="52311"
+WR_WWW_PORT="8080"
+CONF_FIREWALL="no"
+INSTALL_DB2="yes"
+DB2_ADMIN_USER="db2inst111"
+DB2_ADMIN_PWD="${var.db2pw}"
+DB2_PORT="50000"
+DB2_USERS_PWD="${var.db2pw}"
+BES_LIC_FOLDER="/opt/iemlic"
+USE_PROXY="false"
+ADV_PROXY_DEFAULT="false"
+PROXY_USER="none"
+PROXY_HOST="PROXYHOST.mydomain.com"
+PROXY_PORT="3128"
+PROXY_METH="all"
+TEST_PROXY="nofips"
+PVK_KEY_SIZE="min"
+IS_SILENT="TRUE"
+
+EOF
+	destination = "/root/bigfixresponsefile"
+  }
+  
+  # Execute the script remotely: unpack BigFix tarball, install required linux packages
   provisioner "remote-exec" {
   inline = [
 #    "cd /tmp; tar -xvf  bigfix.tar.gz; chmod +x /tmp/installation.sh; sudo bash /tmp/installation.sh –f bigfixresponsefile –opt   BES_GATHER_INTERVAL=$(var.bigfix_var1) –opt BES_CERT_FILE=$(var.bigfix_var2)",
 #     "tar -xvf  bigfix.tar.gz; chmod +x /tmp/installation.sh; sudo bash /tmp/installation.sh –f bigfixresponsefile",
       "tar -xvf  bigfix95.tgz",
+	  "yum install -y fontconfig.x86_64 libXext.x86_64 libXrender.x86_64 libpng12.x86_64 pam.i686 libstdc++.i686 libaio",
+	  "cd /root/ServerInstaller_9.5.8.38-rhe6.x86_64",
+	  "./install.sh -f /root/bigfixresponsefile",
   ]
   }
+  
 
 }
 
 #########################################################
 # Output
 #########################################################
-output "The IP address of the VM with NodeJs installed" {
+output "The IP address of the VM with BigFix installed" {
   value = "${ibm_compute_vm_instance.softlayer_virtual_guest.ipv4_address}"
 }
